@@ -11,9 +11,10 @@
 
 
 library(shiny)
+library(leaflet)
 
 navbarPage("CIFD Alarm Data Dashboard",
-           tabPanel("Controls",
+           tabPanel("Map",
                     sidebarLayout(
                       sidebarPanel(  
                         

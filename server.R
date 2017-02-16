@@ -21,6 +21,8 @@ df$Time <- hms(df$Time)
 df$Time <- hour(df$Time)
 df$Password <- "CIP"
 df$Weekday <- wday(df$Date)
+df$Text <- paste0(month(df$Date),"/",day(df$Date),"/",year(df$Date)," - ",df$Time,"00 hours:  ",
+                  df$SignalType, " at ",tools::toTitleCase(tolower(df$Location)))
 
 df$SignalTypeAbbr <- 0
 
@@ -150,10 +152,20 @@ shinyServer(function(input, output) {
   
   output$map <- renderLeaflet({
     
-    leaflet(data()) %>% addTiles() %>% addMarkers(clusterOptions = markerClusterOptions(),
-                                                  popup = ~as.character(SignalTypeAbbr))
+    leaflet() %>% addTiles() 
     
   })
+  
+  observe({
+    
+    leafletProxy("map", data = data()) %>% 
+      clearMarkerClusters() %>%
+      clearMarkers() %>%
+      addMarkers(clusterOptions = markerClusterOptions(),
+                 popup = ~as.character(Text))#," at ",tools::toTitleCase(tolower(df$Location)))))
+                                     #  month(Date),"/",day(Date),"/",year(Date),", ",Time,"00 hours:  ",       
+  })
+  
   
   output$timeHist <- renderPlot({
     
@@ -197,11 +209,7 @@ shinyServer(function(input, output) {
       xlim(0,8)
   })
   
-  output$arrHist <- renderPlot({
-    ggplot(ResData(), aes(x=DepartureTime)) +
-      geom_bar()
-  })
-  
+
   
   output$Totct <- renderText({ if(input$password != df$Password[1]) 
   {""} else 
