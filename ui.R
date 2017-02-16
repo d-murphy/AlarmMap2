@@ -9,21 +9,43 @@
 
 # Fix size of center window so that 3rd column can't appear on top of it
 
-
+library(shinythemes)
 library(shiny)
 library(leaflet)
+
+
+fluidPage(theme = shinytheme("darkly"),
 
 navbarPage("CIFD Alarm Data Dashboard",
            tabPanel("Map",
                     sidebarLayout(
                       sidebarPanel(  
                         
-                        wellPanel(style = "background-color: #ffffff;",
+                        wellPanel(#style = "background-color: #ffffff;",
                                   em(textOutput("alarmCoverage")),br(),
                                   passwordInput('password', 
                                                 label = "Password", 
                                                 value = ""),  br(),
-                                  
+                          
+                                        
+                                                  
+                                                 
+                                                  
+                                                  # Turned off month count                                  
+                                                  
+                                                  #                                  h4(textOutput("MthCt")),
+                                                  #                                  textOutput("JanCt"),
+                                                  #                                  textOutput("FebCt"),
+                                                  #                                  textOutput("MarCt"),
+                                                  #                                  textOutput("AprCt"),
+                                                  #                                  textOutput("MayCt"),
+                                                  #                                  textOutput("JunCt"),
+                                                  #                                  textOutput("JulCt"),
+                                                  #                                  textOutput("AugCt"),
+                                                  #                                  textOutput("SepCt"),
+                                                  #                                  textOutput("OctCt"),
+                                                  #                                  textOutput("NovCt"),
+                                                  #                                  textOutput("DecCt")
                                   
                                   
                                   
@@ -73,81 +95,50 @@ navbarPage("CIFD Alarm Data Dashboard",
                                   )
                                   
                         )  #closes wellPanel
-                      ), #closes column
+                      ), #closes sidebarPanel
                       mainPanel(
-                        fluidRow(column(3,
-                                        br(),
-                                        h4(textOutput("alarmTypeSubtitle")),
-                                        textOutput("Totct"),br(),
-                                        textOutput("AAct"), 
-                                        textOutput("BrFct"), 
-                                        textOutput("CFct"), 
-                                        textOutput("FMIct"), 
-                                        textOutput("Strct"),
-                                        textOutput("WFct"), 
-                                        textOutput("Miscct"), 
-                                        textOutput("MAct"),
-                                        textOutput("MVAct"),br(),br(),
-                                        
-                                        h4(textOutput("FreqTitle")),
-                                        textOutput("TenPct"),
-                                        textOutput("QtrPct"),
-                                        textOutput("HlfPct"),
-                                        textOutput("ThreeQrtsPct"),
-                                        textOutput("AllPct"), br(),br()
-                                        
-                                        # Turned off month count                                  
-                                        
-                                        #                                  h4(textOutput("MthCt")),
-                                        #                                  textOutput("JanCt"),
-                                        #                                  textOutput("FebCt"),
-                                        #                                  textOutput("MarCt"),
-                                        #                                  textOutput("AprCt"),
-                                        #                                  textOutput("MayCt"),
-                                        #                                  textOutput("JunCt"),
-                                        #                                  textOutput("JulCt"),
-                                        #                                  textOutput("AugCt"),
-                                        #                                  textOutput("SepCt"),
-                                        #                                  textOutput("OctCt"),
-                                        #                                  textOutput("NovCt"),
-                                        #                                  textOutput("DecCt")
-                        ),
-                        column(9,
-                               wellPanel(plotOutput("timeHist",height = 150)),
-                               wellPanel(plotOutput("freqHist",height = 150)),
-                               wellPanel(plotOutput("wdayHist", height = 150)),
-                               wellPanel(plotOutput("MonthHist",height = 150)),
-                               wellPanel(plotOutput("arrHist", height = 150))
+                        
+                        wellPanel(fluidRow(leafletOutput("map"))),
+                        br(),
+                        fluidRow(
+                          column(4, plotOutput("timeHist")),
+                          column(4, plotOutput("freqHist")),
+                          column(4, 
+                            
+                            h4(textOutput("FreqTitle")),
+                            textOutput("TenPct"),
+                            textOutput("QtrPct"),
+                            textOutput("HlfPct"),
+                            textOutput("ThreeQrtsPct"),
+                            textOutput("AllPct"), br(),br(),
+                          
+                            h4(textOutput("alarmTypeSubtitle")),
+                            textOutput("Totct"),br(),
+                            textOutput("AAct"), 
+                            textOutput("BrFct"), 
+                            textOutput("CFct"), 
+                            textOutput("FMIct"), 
+                            textOutput("Strct"),
+                            textOutput("WFct"), 
+                            textOutput("Miscct"), 
+                            textOutput("MAct"),
+                            textOutput("MVAct")
+                            
+                          )
+                                 
+                        )
                                
                         )
-                        )
+                        )),
+           tabPanel("About",
+                        
+                          p("Some text later on.")
                         
                       )
-                    ) 
-           ),
-           tabPanel("Map",
-                    sidebarLayout(
-                      sidebarPanel(
-                        
-                        wellPanel(style = "background-color: #ffffff;",
-                                  textInput('Map Center', 
-                                            label = "Location (City Name or Coordinates)", 
-                                            value = "Central Islip, NY")
-                        ),
-                        
-                        wellPanel(style = "background-color: white;
-                                  font-family: 'arial';
-                                  font-size: 8", 
-                                  
-                                  htmlOutput("alarmSelected")) 
-                      ),
-                      mainPanel(
-                        
-                        leafletOutput("map")  
-                        
-                      ))
-           )
+           
            )    #closes navBarPage
+
+  ) #closes fluidPage
 
 #  fluidRow(  #main section row 
 #       

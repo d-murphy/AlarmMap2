@@ -13,6 +13,7 @@ library(readxl)
 library(lubridate)
 library(stringr)
 library(leaflet)
+library(ggthemes)
 
 filePath <- "MapDownload.csv"
 df <- read.csv(filePath, stringsAsFactors = FALSE)     
@@ -170,44 +171,26 @@ shinyServer(function(input, output) {
   output$timeHist <- renderPlot({
     
     ggplot(data(),aes(x=Time)) +
-      geom_bar(fill = "dark blue")  + 
-      scale_colour_brewer(palette = "Set1") + 
+      geom_bar(fill = "light blue",width = 1)   + 
       ggtitle("Count of Runs for Hour of Day") + 
       xlab("Time of Day") + 
       ylab("Count") + 
-      xlim(0,24)
+      xlim(0,23) + 
+      theme_hc(bgcolor = "darkunica")
   })
-  
-  output$MonthHist <- renderPlot({
-    
-    ggplot(data(),aes(x=month(Date))) +
-      geom_bar(fill = "dark red")  + 
-      ggtitle("Count of Runs for Month") + 
-      xlab("Month") + 
-      ylab("Count") + 
-      xlim(0,13)
-  })
-  
   
   output$freqHist <- renderPlot({
     
     ggplot(data(),aes(x=HourDiff)) +
-      geom_bar(fill = "dark green") + 
+      geom_histogram(fill = "light green", binwidth = 2) + 
       ggtitle("Run Frequency") + 
-      xlab("Time since Last Run") + 
-      ylab("Count") 
+      xlab("Hours since Last Run") + 
+      ylab("Count")  +
+      theme_hc(bgcolor = "darkunica")
     
   })
   
-  
-  output$wdayHist <- renderPlot({
-    ggplot(data(), aes(x=Weekday)) + 
-      geom_bar(fill = "orange") + 
-      ggtitle("Count of Runs for Day of Week") + 
-      xlab("Day of Week") + 
-      ylab("Count") + 
-      xlim(0,8)
-  })
+
   
 
   
