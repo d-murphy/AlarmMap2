@@ -120,7 +120,7 @@ shinyServer(function(input, output) {
   
   output$map <- renderLeaflet({
     
-    leaflet() %>% addTiles() 
+    leaflet() %>% addTiles() %>% fitBounds(-73.262117, 40.743767, -73.140066, 40.820066)
     
   })
   
@@ -130,8 +130,8 @@ shinyServer(function(input, output) {
       clearMarkerClusters() %>%
       clearMarkers() %>%
       addMarkers(clusterOptions = markerClusterOptions(),
-                 popup = ~as.character(Text))#," at ",tools::toTitleCase(tolower(df$Location)))))
-                                     #  month(Date),"/",day(Date),"/",year(Date),", ",Time,"00 hours:  ",       
+                 popup = ~as.character(Text)) 
+                                         
   })
   
   
@@ -142,7 +142,8 @@ shinyServer(function(input, output) {
       ggtitle("Count of Runs for Hour of Day") + 
       xlab("Time of Day") + 
       ylab("Count") + 
-      xlim(0,23) + 
+    #  xlim(0,23) +
+      scale_x_continuous(breaks=seq(0,23,4))+
       theme_hc(bgcolor = "darkunica")
   })
   

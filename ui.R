@@ -5,13 +5,19 @@ library(leaflet)
 
 
 fluidPage(theme = shinytheme("darkly"),
+          
+          tags$style(HTML("
+            body {
+              color: #898989;
+            }
+          ")),
 
 navbarPage("CIFD Alarm Data Dashboard",
            tabPanel("Map",
                     sidebarLayout(
                       sidebarPanel(  
                         
-                        wellPanel(#style = "background-color: #ffffff;",
+                        wellPanel(
                                   em(textOutput("alarmCoverage")),br(),
                                   passwordInput('password', 
                                                 label = "Password", 
