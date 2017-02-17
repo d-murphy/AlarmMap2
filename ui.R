@@ -1,14 +1,4 @@
 
-# Add 3 other graphs
-# Add action button for Location
-# Connect Location Zoom
-# Update text for counts
-# Make colors consistent accross all graphs
-# Make option to turn off colors
-# Make filter for alarm types
-
-# Fix size of center window so that 3rd column can't appear on top of it
-
 library(shinythemes)
 library(shiny)
 library(leaflet)

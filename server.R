@@ -1,14 +1,8 @@
 
-# This is the server logic for a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
 
 library(shiny)
 library(ggplot2)
 library(dplyr)
-library(ggmap)
 library(readxl)
 library(lubridate)
 library(stringr)
@@ -27,12 +21,6 @@ df$Text <- paste0(month(df$Date),"/",day(df$Date),"/",year(df$Date)," - ",df$Tim
 
 df$SignalTypeAbbr <- 0
 
-
-
-
-### need to create reactive set.  
-### need to create data filter
-### need to create interface.  Its really good though.  
 
 for(i in 1:dim(df)[1]){
   
@@ -75,13 +63,6 @@ shinyServer(function(input, output) {
   
   data <- reactive({
     
-    ### try to figure out how to do this with      
-    #      brushdf <- brushedPoints(df , input$plot_brush,  
-    #                           xvar = "lon", yvar = "lat")
-    
-    
-    #          if(is.na(brushdf[1,1])){
-    
     df <- df %>% filter(Date >= ymd(input$dates[1]) &
                           Date <= ymd(input$dates[2]) &
                           Time >= input$hours[1] &
@@ -92,20 +73,6 @@ shinyServer(function(input, output) {
       arrange(Date,Time) %>% 
       mutate(HourDiff = ((as.numeric(Date) - as.numeric(lag(Date)))/3600 + Time - lag(Time)))
     
-    #          }else{
-    
-    #         df <- df %>% filter(Date >= ymd(input$dates[1]) &
-    #                               Date <= ymd(input$dates[2]) &
-    #                               Time >= input$hours[1] &
-    #                               Time <= input$hours[2] &
-    #                               Password == input$password &
-    #                               SignalTypeAbbr %in% input$alarmFilter &
-    #                               Weekday %in% input$wdayFilter &
-    #                               RunNumber %in% brushdf$RunNumber) %>% 
-    #                           arrange(Date,Time) %>% 
-    #                           mutate(HourDiff = ((as.numeric(Date) - as.numeric(lag(Date)))/3600 + Time - lag(Time)))
-    #         
-    #                 }       
   })
   
   
@@ -265,68 +232,8 @@ shinyServer(function(input, output) {
     
   })
   
-  output$alarmSelected <- renderUI({
-    
-    ReturnStr <- as.character()  
-    
-    tempdf <- nearPoints(data() , input$plot_click,  
-                         xvar = "lon", yvar = "lat")
-    
-    if(is.na(tempdf[1,1])){
-      HTML(paste0("Click a point on the map to see Alarm Info."))
-    } else {
-      
-      for(i in 1:dim(tempdf)[1]){
-        
-        text1 <- paste0("Run Number:  ",tempdf$RunNumber[i])
-        text2 <- paste0("Alarm Type:  ", tempdf$SignalTypeAbbr[i])
-        text3 <- paste0("Date:  ", month(tempdf$Date[i]),"/",day(tempdf$Date[i]),"/",year(tempdf$Date[i]))
-        text4 <- paste0("Hour of Day: ", tempdf$Time[i])
-        text5 <- paste0("Address:  ", tempdf$Location[i])
-        text6 <- paste0("")
-        
-        NewStr <- as.character()
-        NewStr <- paste(text1, text5, text2, text3, text4, text6, sep="</br>")
-        
-        ReturnStr <- paste(ReturnStr, NewStr, sep="</br>")
-        
-      }
-      
-      
-      HTML(ReturnStr)
-      
-    }
-    
-  })
   
-  
-  #     output$alarmSelected <- renderPrint({
-  #       
-  #       tempdf <- nearPoints(data() , input$plot_click,  
-  #                  xvar = "lon", yvar = "lat")
-  #       
-  #       if(is.null(tempdf)){
-  #         cat("", "\n")
-  #       } else {
-  #       
-  #         ReturnStr <- as.character()
-  #       
-  #         for(i in 1:dim(tempdf)[1]){
-  #       
-  #         ReturnStr <- paste0(ReturnStr,
-  #             cat("Run Number:  ",tempdf$RunNumber[i],  
-  #                 "\rAlarm Type:  ", tempdf$SignalTypeAbbr[i], " - " ,
-  #                 month(tempdf$Date[i]),"/",day(tempdf$Date[i]),"/",year(tempdf$Date[i]), " - ",
-  #                 "Hour:  ", tempdf$Time[i]
-  #                 ))
-  #         
-  #               }
-  # 
-  #         cat(ReturnStr, "\n")
-  #       
-  #       }
-  #     })
-  
+
 })  #closes Shiny Server
 
 
