@@ -58,6 +58,9 @@ for(i in 1:dim(df)[1]){
 }
 
 
+resdf <- read.csv("AggResponseData.csv", stringsAsFactors = FALSE)
+
+
 shinyServer(function(input, output) {
   
   
@@ -75,7 +78,13 @@ shinyServer(function(input, output) {
     
   })
   
-  
+  RspData <- reactive({
+    
+    temp <- data()
+    
+    resdf <- resdf %>% filter(RunNumber %in% temp$RunNumber)
+    
+  })
   
   
   # The counts below are used in the left column    
@@ -143,7 +152,7 @@ shinyServer(function(input, output) {
       xlab("Time of Day") + 
       ylab("Count") + 
     #  xlim(0,23) +
-      scale_x_continuous(breaks=seq(0,23,4))+
+      scale_x_continuous(limits = c(0,23), breaks=seq(0,23,4))+
       theme_hc(bgcolor = "darkunica")
   })
   
@@ -158,7 +167,17 @@ shinyServer(function(input, output) {
     
   })
   
-
+  output$resHist <- renderPlot({
+    
+    ggplot(RspData(),aes(x=AT)) +
+      geom_histogram(fill = "yellow", bins = 15) + 
+      ggtitle("First Apparatus Arrival") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count")  +
+      theme_hc(bgcolor = "darkunica")
+    
+  })
+  
   
 
   
@@ -248,151 +267,5 @@ shinyServer(function(input, output) {
 
 #      df <- read.csv(inFile$datapath, stringsAsFactors = FALSE)
 
-###  This step shortened the dataset, if dataset needed lon lat
-#df <- df[1:10,]
-
-### This section adds lon/lat if missing, or checks that it is not NA and adds
-
-#if(ncol(df)==5){
-#  df <- cbind(df, geocode(df$Location))
-#} else {
-
-#  for(i in 1:dim(df)[1]){
-
-#    if(is.na(df$lon[i]) | is.na(df$lat[i]) ){
-#      returnDF <- geocode(df$Location[i])
-#      df$lon[i] <- returnDF$lon[1]
-#      df$lat[i] <- returnDF$lat[1]
-#    }
-
-#  }
-# }
-
-### This step writes the downloaded lon/lat data so it doesn't need to be retrieved again
-#    write.csv(df, file = "C:/Users/murph/Desktop/MapDownload.csv",row.names = FALSE)
 
 
-
-
-### Code used to create the Aggregate Response Data
-
-# resdf <- read.csv("ResponseData.csv", stringsAsFactors = FALSE)
-# resdf <- resdf %>% select(Unit, Run, Response...2.Pr, Response...21.A)
-# colnames(resdf) <- c("Unit", "RunNumber","DepartureTime","ArrivalTime")
-# 
-# resdf <- resdf %>% filter(grepl("3/7",Unit))
-# resdf$Unit <- str_sub(resdf$Unit, -2,-1)
-# resdf$Aggr <- "Actual"
-# 
-# #Frontline Units
-# 
-# resSum <- resdf %>% filter(Unit %in% c("01","02","03","04","05","06","07","08","09","15")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "FrontlineUnitsBestDeparture"
-# 
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- data.frame()
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# #Chiefs
-# 
-# resSum <- resdf %>% filter(Unit %in% c("30","31","32","33")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "ChiefsBestDeparture"
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("01","03","06","07")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "MainBestDeparture"
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("02","05","15","09")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "Sta2BestDeparture"
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("04","08")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "Sta3BestDeparture"
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("01","02","03","04","07","08","09")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "FirstEngineBestDeparture"
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("05","06","15")) %>% group_by(RunNumber) %>% 
-#   mutate(DeptRank = min_rank(DepartureTime))
-# resSum$Aggr <- "FirstTruckBestDeparture"
-# resSum <- resSum %>% filter(DeptRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# 
-# resdf <- bind_rows(resdf,resAdd)
-# 
-# ### Now best Arrival
-# 
-# resSum <- resdf %>% filter(Unit %in% c("01","02","03","04","05","06","07","08","09","15") & Aggr =="Actual" & ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "FrontlineUnitsBestArrival"
-# 
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- data.frame()
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# #Chiefs
-# 
-# resSum <- resdf %>% filter(Unit %in% c("30","31","32","33")& Aggr =="Actual"& ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "ChiefsBestArrival"
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("01","03","06","07")& Aggr =="Actual" & ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "MainBestArrival"
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("02","05","15","09")& Aggr =="Actual" & ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "Sta2BestArrival"
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("04","08")& Aggr =="Actual" & ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "Sta3BestArrival"
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("01","02","03","04","07","08","09")& Aggr =="Actual" & ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "FirstEngineBestArrival"
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# resSum <- resdf %>% filter(Unit %in% c("05","06","15")& Aggr =="Actual" & ArrivalTime != "") %>% 
-#   group_by(RunNumber) %>% 
-#   mutate(ArrRank = min_rank(ArrivalTime))
-# resSum$Aggr <- "FirstTruckBestArrival"
-# resSum <- resSum %>% filter(ArrRank==1) %>% select(Unit, RunNumber,DepartureTime,ArrivalTime,Aggr)
-# resAdd <- bind_rows(resAdd,ungroup(resSum))
-# 
-# 
-# resdf <- bind_rows(resdf,resAdd)
-# 
-# write.csv(resdf,"C:/Users/murph/Desktop/R/AlarmMap/AggResponseData.csv", row.names = FALSE)
-# 
-# 

@@ -97,9 +97,10 @@ navbarPage("CIFD Alarm Data Dashboard",
                         wellPanel(fluidRow(leafletOutput("map"))),
                         br(),
                         fluidRow(
-                          column(4, plotOutput("timeHist")),
-                          column(4, plotOutput("freqHist")),
-                          column(4, 
+                          column(3, plotOutput("timeHist")),
+                          column(3, plotOutput("freqHist")),
+                          column(3, plotOutput("resHist")),
+                          column(3, 
                             
                             h4(textOutput("FreqTitle")),
                             textOutput("TenPct"),
