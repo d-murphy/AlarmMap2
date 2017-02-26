@@ -84,8 +84,27 @@ navbarPage("CIFD Alarm Data Dashboard",
                                                                                "Friday"   = "6",
                                                                                "Saturday" = "7",
                                                                                "Sunday" = "1"),
-                                                                selected = c("2","3","4","5","6","7","1")
-                                             )
+                                                                selected = c("2","3","4","5","6","7","1")),
+                                             
+                                             br(),br(),
+                                             checkboxInput("respOn",label = "Turn on Arrival Time Filter?",value = FALSE),
+                                             sliderInput('respRange',
+                                                         label = "First Apparatus Arrival Time (seconds)",
+                                                         min = 0,
+                                                         max = 1800,
+                                                         value = c(0,1800),
+                                                         animate = TRUE)
+                                                                
+                                                                                 
+                                              #
+#                                               sliderInput('respRange',
+#                                                           label = "First Apparatus Arrival Time (seconds)",
+#                                                           min = 0,
+#                                                           max = 1800,
+#                                                           value = c(0,1800),
+#                                                           animate = TRUE)
+#                                                                 
+                                             
                                              
                                     )
                                   )

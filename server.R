@@ -16,8 +16,11 @@ df$Time <- hms(df$Time)
 df$Time <- hour(df$Time)
 df$Password <- "CIP"
 df$Weekday <- wday(df$Date)
-df$Text <- paste0(month(df$Date),"/",day(df$Date),"/",year(df$Date)," - ",df$Time,"00 hours:  ",
-                  df$SignalType, " at ",tools::toTitleCase(tolower(df$Location)))
+df$Text <- ifelse(is.na(df$Unit),
+                  paste0(month(df$Date),"/",day(df$Date),"/",year(df$Date)," - ",df$Time,"00 hours:  ",
+                         df$SignalType, " at ",tools::toTitleCase(tolower(df$Location))," - Response info not obtained."),
+                  paste0(month(df$Date),"/",day(df$Date),"/",year(df$Date)," - ",df$Time,"00 hours:  ",
+                  df$SignalType, " at ",tools::toTitleCase(tolower(df$Location))," - First Due Piece:  ",df$Unit," at ",df$AT," seconds"))
 
 df$SignalTypeAbbr <- 0
 
@@ -66,23 +69,56 @@ shinyServer(function(input, output) {
   
   data <- reactive({
     
-    df <- df %>% filter(Date >= ymd(input$dates[1]) &
-                          Date <= ymd(input$dates[2]) &
-                          Time >= input$hours[1] &
-                          Time <= input$hours[2] &
-                          Password == input$password &
-                          SignalTypeAbbr %in% input$alarmFilter &
-                          Weekday %in% input$wdayFilter) %>% 
-      arrange(Date,Time) %>% 
-      mutate(HourDiff = ((as.numeric(Date) - as.numeric(lag(Date)))/3600 + Time - lag(Time)))
+    if(is.null(input$map_bounds)){
     
-  })
-  
-  RspData <- reactive({
+      df <- df %>% filter(Date >= ymd(input$dates[1]) &
+                            Date <= ymd(input$dates[2]) &
+                            Time >= input$hours[1] &
+                            Time <= input$hours[2] &
+                            Password == input$password &
+                            SignalTypeAbbr %in% input$alarmFilter &
+                            Weekday %in% input$wdayFilter 
+                          ) %>% 
+        arrange(Date,Time) %>% 
+        mutate(HourDiff = ((as.numeric(Date) - as.numeric(lag(Date)))/3600 + Time - lag(Time)))
+        
+    } else {
     
-    temp <- data()
+    bounds <- input$map_bounds
     
-    resdf <- resdf %>% filter(RunNumber %in% temp$RunNumber)
+      if(input$respOn) {
+         
+        df <- df %>% filter(Date >= ymd(input$dates[1]) &
+                              Date <= ymd(input$dates[2]) &
+                              Time >= input$hours[1] &
+                              Time <= input$hours[2] &
+                              Password == input$password &
+                              SignalTypeAbbr %in% input$alarmFilter &
+                              Weekday %in% input$wdayFilter &
+                              lat > bounds$south & lat < bounds$north &
+                              lon > bounds$west  & lon < bounds$east &
+                              AT >= input$respRange[1] &
+                              AT <= input$respRange[2]
+        ) %>% 
+          arrange(Date,Time) %>% 
+          mutate(HourDiff = ((as.numeric(Date) - as.numeric(lag(Date)))/3600 + Time - lag(Time)))
+      } else {
+          
+        df <- df %>% filter(Date >= ymd(input$dates[1]) &
+                              Date <= ymd(input$dates[2]) &
+                              Time >= input$hours[1] &
+                              Time <= input$hours[2] &
+                              Password == input$password &
+                              SignalTypeAbbr %in% input$alarmFilter &
+                              Weekday %in% input$wdayFilter &
+                              lat > bounds$south & lat < bounds$north &
+                              lon > bounds$west  & lon < bounds$east 
+        ) %>% 
+          arrange(Date,Time) %>% 
+          mutate(HourDiff = ((as.numeric(Date) - as.numeric(lag(Date)))/3600 + Time - lag(Time)))
+      }
+    
+    }
     
   })
   
@@ -169,7 +205,7 @@ shinyServer(function(input, output) {
   
   output$resHist <- renderPlot({
     
-    ggplot(RspData(),aes(x=AT)) +
+    ggplot(data(),aes(x=AT)) +
       geom_histogram(fill = "yellow", bins = 15) + 
       ggtitle("First Apparatus Arrival") + 
       xlab("Seconds into Alarm") + 
