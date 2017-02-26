@@ -150,7 +150,7 @@ shinyServer(function(input, output) {
   output$freqHist <- renderPlot({
     
     ggplot(data(),aes(x=HourDiff)) +
-      geom_histogram(fill = "light green", binwidth = 2) + 
+      geom_histogram(fill = "light green", bins = 15) + 
       ggtitle("Run Frequency") + 
       xlab("Hours since Last Run") + 
       ylab("Count")  +
