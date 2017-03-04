@@ -189,6 +189,8 @@ shinyServer(function(input, output) {
   })
   
   
+  
+  
   output$timeHist <- renderPlot({
     
     ggplot(data(),aes(x=Time)) +
@@ -198,7 +200,8 @@ shinyServer(function(input, output) {
       ylab("Count") + 
     #  xlim(0,23) +
       scale_x_continuous(limits = c(0,23), breaks=seq(0,23,4))+
-      theme_hc(bgcolor = "darkunica")
+      theme_hc(bgcolor = "darkunica") +
+      scale_y_continuous(limits = c(0,80))
   })
   
   output$freqHist <- renderPlot({
@@ -208,9 +211,12 @@ shinyServer(function(input, output) {
       ggtitle("Run Frequency") + 
       xlab("Hours since Last Run") + 
       ylab("Count")  +
-      theme_hc(bgcolor = "darkunica")
+      theme_hc(bgcolor = "darkunica")+
+      scale_y_continuous(limits = c(0,250))
     
   })
+  
+  
   
   output$resHist <- renderPlot({
     
@@ -219,9 +225,13 @@ shinyServer(function(input, output) {
       ggtitle("First Apparatus Arrival") + 
       xlab("Seconds into Alarm") + 
       ylab("Count")  +
-      theme_hc(bgcolor = "darkunica")
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,40))
     
   })
+  
+  trkPlotYmax <- 25
   
   output$Eng1 <- renderPlot({
     
@@ -232,7 +242,10 @@ shinyServer(function(input, output) {
       ylab("Count") + 
       theme_hc(bgcolor = "darkunica") +
       scale_x_continuous(limits = c(0,1200)) +
-      scale_y_continuous(limits = c(0,50))
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "white"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
   })
   
   output$Eng2 <- renderPlot({
@@ -244,7 +257,10 @@ shinyServer(function(input, output) {
       ylab("Count") + 
       theme_hc(bgcolor = "darkunica") +
       scale_x_continuous(limits = c(0,1200)) +
-      scale_y_continuous(limits = c(0,50))
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "forestgreen"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
   })
   
   output$Eng3 <- renderPlot({
@@ -256,7 +272,10 @@ shinyServer(function(input, output) {
       ylab("Count") + 
       theme_hc(bgcolor = "darkunica") +
       scale_x_continuous(limits = c(0,1200)) +
-      scale_y_continuous(limits = c(0,50))
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "orange"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
   })
   
   output$Eng4 <- renderPlot({
@@ -268,7 +287,70 @@ shinyServer(function(input, output) {
       ylab("Count") + 
       theme_hc(bgcolor = "darkunica") +
       scale_x_continuous(limits = c(0,1200)) +
-      scale_y_continuous(limits = c(0,50))
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "gray"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
+  })
+  
+  output$Trk5 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==5) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("Ladder 5 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "blue"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
+  })
+  
+  output$Trk6 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==6) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("FES Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "yellow"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
+  })
+  
+  output$Eng8 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==8) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("Engine 8 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "red"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
+  })
+  
+  output$Trk15 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==15) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("Truck 15 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,trkPlotYmax)) + 
+      scale_fill_manual(values=c("WHEAT", "red"),
+                        name="", breaks=c(1,0),
+                        labels=c("First to Arrive", "All others"))
   })
   
   
