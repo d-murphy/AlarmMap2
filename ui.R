@@ -146,7 +146,14 @@ navbarPage("CIFD Alarm Data Dashboard",
                                
                         )
                         )),
-           tabPanel("About",
+           
+            tabPanel("Apparatus Response",
+                     column(3,plotOutput("Eng1")),
+                     column(3,plotOutput("Eng2")),
+                     column(3,plotOutput("Eng3")),
+                     column(3,plotOutput("Eng4"))
+                     ),
+            tabPanel("About",
                         
                           p("Some text later on.")
                         

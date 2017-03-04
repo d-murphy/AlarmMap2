@@ -10,7 +10,8 @@ library(leaflet)
 library(ggthemes)
 
 filePath <- "MapDownload.csv"
-df <- read.csv(filePath, stringsAsFactors = FALSE)     
+df <- read.csv(filePath, stringsAsFactors = FALSE)    
+resdf <- read.csv("resdf.csv", stringsAsFactors = FALSE)
 df$Date <- mdy(df$Date)
 df$Time <- hms(df$Time)
 df$Time <- hour(df$Time)
@@ -61,7 +62,6 @@ for(i in 1:dim(df)[1]){
 }
 
 
-resdf <- read.csv("AggResponseData.csv", stringsAsFactors = FALSE)
 
 
 shinyServer(function(input, output) {
@@ -123,7 +123,16 @@ shinyServer(function(input, output) {
   })
   
   
-  # The counts below are used in the left column    
+  resdata <- reactive({  
+    
+    temp <- data() %>% select(RunNumber)
+    
+    resdf %>% filter(RunNumber %in% temp$RunNumber)
+    
+    })
+  
+  
+  # Counts 
   
   BrFct <- reactive({ data() %>% filter(SignalTypeAbbr == "Brush Fire") %>% summarize(ct = n()) })
   Strct <- reactive({ data() %>% filter(SignalTypeAbbr == "Structure") %>% summarize(ct = n()) })
@@ -214,8 +223,55 @@ shinyServer(function(input, output) {
     
   })
   
+  output$Eng1 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==1) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("Engine 1 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,50))
+  })
   
-
+  output$Eng2 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==2) , aes(x=ArrivalTime, fill = factor(ArrRank))) +   
+      geom_histogram( bins = 15) + 
+      ggtitle("Engine 2 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,50))
+  })
+  
+  output$Eng3 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==3) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("Engine 3 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,50))
+  })
+  
+  output$Eng4 <- renderPlot({
+    
+    ggplot(resdata() %>% filter(Unit ==4) , aes(x=ArrivalTime, fill=factor(ArrRank))) +   
+      geom_histogram(bins = 15) + 
+      ggtitle("Engine 4 Arrival Times") + 
+      xlab("Seconds into Alarm") + 
+      ylab("Count") + 
+      theme_hc(bgcolor = "darkunica") +
+      scale_x_continuous(limits = c(0,1200)) +
+      scale_y_continuous(limits = c(0,50))
+  })
+  
+  
   
   output$Totct <- renderText({ if(input$password != df$Password[1]) 
   {""} else 
